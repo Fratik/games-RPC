@@ -5,10 +5,10 @@
   "main": "src/main.js",
   "scripts": {
     "app": "electron src/main.js",
-    "package-mac": "electron-packager . --overwrite --asar=true --platform=darwin --arch=x64 --prune=true --../out=release-builds",
-    "package-win": "electron-packager . --overwrite --asar=true --platform=win32 --arch=ia32 --prune=true --../out=release-builds",
-    "package-linux": "electron-packager . --overwrite --asar=true --platform=linux --arch=x64 --prune=true --../out=release-builds",
-    "package-all": "electron-packager . --overwrite --asar=true --all --prune=true --../out=release-builds"
+    "build:mac": "electron-packager . --overwrite --asar --platform=darwin --arch=x64 --prune=true --out=builds",
+    "build:win": "electron-packager . --overwrite --asar --platform=win32 --arch=ia32 --prune=true --out=builds",
+    "build:linux": "electron-packager . --overwrite --asar --platform=linux --arch=x64 --prune=true --out=builds",
+    "build": "electron-packager . --overwrite --asar=true --all --prune=true --out=builds"
   },
   "author": "",
   "license": "MIT",
@@ -17,6 +17,7 @@
     "spotify.js": "github:devsnek/spotify.js"
   },
   "devDependencies": {
-    "electron": "^1.7.9"
+    "electron": "^1.7.9",
+    "electron-packager": "^9.1.0"
   }
 }

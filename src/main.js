@@ -56,12 +56,25 @@ async function setActivity() {
     state: track.album_resource.name,
     startTimestamp: Math.round(Date.now() / 1000) - Math.round(playing_position),
     largeImageKey: 'logo',
+    spectateSecret: track.track_resource.uri,
     instance: true,
   });
 }
 
+let request;
 rpc.on('ready', async() => {
+  rpc.subscribe('ACTIVITY_SPECTATE', ({ secret }) => {
+    if (request === false)
+      spotify.play(secret);
+    else
+      request = secret;
+  });
+
   await spotify.init();
+
+  if (request)
+    spotify.play(request);
+  request = false;
 
   setActivity();
 

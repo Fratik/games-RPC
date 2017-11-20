@@ -77,12 +77,10 @@ function stateChanged({ track, playing }) {
 }
 
 async function checkSpotify() {
-  // console.log('Checking Spotify...');
   const { track, playing_position, playing } = await spotify.status();
-  if (!stateChanged({ track, playing }))
-    return; // console.log('Spotify state is current, not updating!');
 
-  // console.log('Updating presence...');
+  if (!stateChanged({ track, playing }))
+    return;
 
   current.playing = playing;
   current.trackName = track.track_resource.name;
@@ -90,18 +88,26 @@ async function checkSpotify() {
   current.artistName = track.artist_resource.name;
   current.albumName = track.album_resource.name;
   current.time = playing_position;
-  setActivity();
+
+  return setActivity();
 }
 
 rpc.on('ready', async() => {
-  await spotify.init();
+  try {
+    await spotify.init();
+  } catch (err) {
+    app.quit();
+  }
 
   rpc.subscribe('ACTIVITY_SPECTATE', ({ secret }) => {
     spotify.play(secret);
   });
 
   checkSpotify();
-  setInterval(() => checkSpotify(), 5e3);
+
+  setInterval(() => {
+    checkSpotify().catch(() => app.quit());
+  }, 5e3);
 });
 
 rpc.login(ClientId).catch(console.error);

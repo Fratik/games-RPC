@@ -68,10 +68,8 @@ async function setActivity() {
   console.log('Presence updated');
 }
 
-function stateChanged({ track, playing_position, playing }) {
+function stateChanged({ track, playing }) {
   if (track.track_resource.uri !== current.trackUri)
-    return true;
-  if (playing_position !== current.time)
     return true;
   if (playing !== current.playing)
     return true;
@@ -81,7 +79,7 @@ function stateChanged({ track, playing_position, playing }) {
 async function checkSpotify() {
   console.log('Checking Spotify...');
   const { track, playing_position, playing } = await spotify.status();
-  if (!stateChanged({ track, playing_position, playing }))
+  if (!stateChanged({ track, playing }))
     return console.log('Spotify state is current, not updating!');
 
   console.log('Updating presence...');

@@ -45,42 +45,65 @@ app.setAsDefaultProtocolClient(`discord-${ClientId}`);
 
 const rpc = new DiscordRPC.Client({ transport: 'ipc' });
 
+const current = {};
+
 async function setActivity() {
   if (!rpc)
     return;
 
-  const { track, playing_position } = await spotify.status();
-
-  rpc.setActivity({
-    details: `${track.track_resource.name} - ${track.artist_resource.name}`,
-    state: track.album_resource.name,
-    startTimestamp: Math.round(Date.now() / 1000) - Math.round(playing_position),
+  await rpc.setActivity({
+    details: current.trackUri ? `${current.trackName} - ${current.artistName}` : 'Nothing',
+    state: current.albumName,
     largeImageKey: 'logo',
-    spectateSecret: track.track_resource.uri,
+    smallImageKey: current.playing ? 'play' : 'pause',
+    smallImageText: current.playing ? 'Playing' : 'Paused',
+    startTimestamp: current.trackUri ?
+      Math.round(Date.now() / 1000) - Math.round(current.time) :
+      undefined,
+    partyId: current.trackUri ? `party_${current.trackUri}` : undefined,
+    spectateSecret: current.trackUri ? current.trackUri : undefined,
     instance: true,
   });
+
+  console.log('Presence updated');
 }
 
-let request;
-rpc.on('ready', async() => {
-  rpc.subscribe('ACTIVITY_SPECTATE', ({ secret }) => {
-    if (request === false)
-      spotify.play(secret);
-    else
-      request = secret;
-  });
+function stateChanged({ track, playing_position, playing }) {
+  if (track.track_resource.uri !== current.trackUri)
+    return true;
+  if (playing_position !== current.time)
+    return true;
+  if (playing !== current.playing)
+    return true;
+  return false;
+}
 
+async function checkSpotify() {
+  console.log('Checking Spotify...');
+  const { track, playing_position, playing } = await spotify.status();
+  if (!stateChanged({ track, playing_position, playing }))
+    return console.log('Spotify state is current, not updating!');
+
+  console.log('Updating presence...');
+
+  current.playing = playing;
+  current.trackName = track.track_resource.name;
+  current.trackUri = track.track_resource.uri;
+  current.artistName = track.artist_resource.name;
+  current.albumName = track.album_resource.name;
+  current.time = playing_position;
+  setActivity();
+}
+
+rpc.on('ready', async() => {
   await spotify.init();
 
-  if (request)
-    spotify.play(request);
-  request = false;
+  rpc.subscribe('ACTIVITY_SPECTATE', ({ secret }) => {
+    spotify.play(secret);
+  });
 
-  setActivity();
-
-  setInterval(() => {
-    setActivity();
-  }, 15e3);
+  checkSpotify();
+  setInterval(() => checkSpotify(), 5e3);
 });
 
 rpc.login(ClientId).catch(console.error);

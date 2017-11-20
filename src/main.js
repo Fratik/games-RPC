@@ -52,8 +52,8 @@ async function setActivity() {
     return;
 
   await rpc.setActivity({
-    details: current.trackUri ? `${current.trackName} - ${current.artistName}` : 'Nothing',
-    state: current.albumName,
+    details: current.trackName,
+    state: current.trackUri ? `${current.albumName}, ${current.artistName}` : undefined,
     largeImageKey: 'logo',
     smallImageKey: current.playing ? 'play' : 'pause',
     smallImageText: current.playing ? 'Playing' : 'Paused',

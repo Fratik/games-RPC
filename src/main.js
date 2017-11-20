@@ -65,7 +65,7 @@ async function setActivity() {
     instance: true,
   });
 
-  console.log('Presence updated');
+  console.log(`Presence updated: ${current.trackName}`);
 }
 
 function stateChanged({ track, playing }) {
@@ -77,12 +77,12 @@ function stateChanged({ track, playing }) {
 }
 
 async function checkSpotify() {
-  console.log('Checking Spotify...');
+  // console.log('Checking Spotify...');
   const { track, playing_position, playing } = await spotify.status();
   if (!stateChanged({ track, playing }))
-    return console.log('Spotify state is current, not updating!');
+    return; // console.log('Spotify state is current, not updating!');
 
-  console.log('Updating presence...');
+  // console.log('Updating presence...');
 
   current.playing = playing;
   current.trackName = track.track_resource.name;

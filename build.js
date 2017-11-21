@@ -18,9 +18,6 @@ const opt = {
   overwrite: true,
   prune: true,
   out: './builds',
-  ignore: [
-    'node_modules/uuid',
-  ],
 };
 
 if (sel) {
@@ -30,4 +27,8 @@ if (sel) {
   opt.all = true;
 }
 
-packager(opt).then(console.log);
+packager(opt).then((builds) => {
+  for (const build of builds)
+    // eslint-disable-next-line no-console
+    console.log('->', `"${build}"`);
+});

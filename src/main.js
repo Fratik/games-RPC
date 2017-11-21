@@ -7,7 +7,11 @@ const DiscordRPC = require('discord-rpc');
 const Spotify = require('spotify.js');
 const spotify = new Spotify();
 
+process.on('unhandledRejection', console.error);
+
 const ClientId = '381507901510123521';
+
+app.setAsDefaultProtocolClient(`discord-${ClientId}`);
 
 let mainWindow;
 
@@ -40,8 +44,6 @@ app.on('activate', () => {
   if (mainWindow === null)
     createWindow();
 });
-
-app.setAsDefaultProtocolClient(`discord-${ClientId}`);
 
 const rpc = new DiscordRPC.Client({ transport: 'ipc' });
 
@@ -78,6 +80,9 @@ function stateChanged({ track, playing }) {
 
 async function checkSpotify() {
   const { track, playing_position, playing } = await spotify.status();
+
+  if (!track.track_resource)
+    return;
 
   if (!stateChanged({ track, playing }))
     return;

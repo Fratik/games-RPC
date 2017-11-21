@@ -5,10 +5,10 @@
   "main": "src/main.js",
   "scripts": {
     "app": "electron src/main.js",
-    "build:mac": "electron-packager . --overwrite --asar --platform=darwin --arch=x64 --prune=true --out=builds",
-    "build:win": "electron-packager . --overwrite --asar --platform=win32 --arch=ia32 --prune=true --out=builds",
-    "build:linux": "electron-packager . --overwrite --asar --platform=linux --arch=x64 --prune=true --out=builds",
-    "build": "electron-packager . --overwrite --asar=true --all --prune=true --out=builds"
+    "build:mac": "node build.js mac",
+    "build:win": "node build.js win",
+    "build:linux": "node build.js linux",
+    "build": "node build.js all"
   },
   "author": "",
   "license": "MIT",

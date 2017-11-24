@@ -7,7 +7,9 @@ const DiscordRPC = require('discord-rpc');
 const Spotify = require('spotify.js');
 const spotify = new Spotify();
 
-process.on('unhandledRejection', console.error);
+process.on('unhandledRejection', (err) => {
+  console.error(err);
+});
 
 const ClientId = '381507901510123521';
 
@@ -90,8 +92,8 @@ async function checkSpotify() {
   current.playing = playing;
   current.trackName = track.track_resource.name;
   current.trackUri = track.track_resource.uri;
-  current.artistName = track.artist_resource.name;
-  current.albumName = track.album_resource.name;
+  current.artistName = track.artist_resource ? track.artist_resource.name : 'Unknown Artist';
+  current.albumName = track.album_resource ? track.album_resource.name : 'Unknown Album';
   current.time = playing_position;
 
   return setActivity();
@@ -111,7 +113,7 @@ rpc.on('ready', async() => {
   checkSpotify();
 
   setInterval(() => {
-    checkSpotify().catch(() => app.quit());
+    checkSpotify();
   }, 5e3);
 });
 

@@ -72,10 +72,12 @@ async function setActivity() {
   console.log(`Presence updated: ${current.trackName}`);
 }
 
-function stateChanged({ track, playing }) {
+function stateChanged({ track, playing, playing_position }) {
   if (track.track_resource.uri !== current.trackUri)
     return true;
   if (playing !== current.playing)
+    return true;
+  if (playing_position === current.time)
     return true;
   return false;
 }
@@ -86,7 +88,7 @@ async function checkSpotify() {
   if (!track.track_resource)
     return;
 
-  if (!stateChanged({ track, playing }))
+  if (!stateChanged({ track, playing, playing_position }))
     return;
 
   current.playing = playing;

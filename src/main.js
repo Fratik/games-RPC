@@ -102,15 +102,18 @@ async function checkSpotify() {
   current.timeStart = Math.round(playing_position);
   current.timeEnd = playing ? track.length : undefined;
 
+  if (current.trackName)
+    current.trackName = current.trackName.padEnd(2, '\u200b');
+  if (current.albumName)
+    current.albumName = current.albumName.padEnd(2, '\u200b');
+  if (current.artistName)
+    current.artistName = current.artistName.padEnd(2, '\u200b');
+
   return setActivity();
 }
 
 rpc.on('ready', async() => {
-  try {
-    await spotify.init();
-  } catch (err) {
-    app.quit();
-  }
+  await spotify.init();
 
   rpc.subscribe('ACTIVITY_SPECTATE', ({ secret }) => {
     spotify.play(secret);

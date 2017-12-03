@@ -61,12 +61,12 @@ async function setActivity() {
     largeImageKey: 'logo',
     smallImageKey: current.playing ? 'play' : 'pause',
     smallImageText: current.playing ? 'Playing' : 'Paused',
-    startTimestamp: current.trackUri ?
+    startTimestamp: current.trackUri ? current.playing ?
       Math.round(Date.now() / 1000) - current.timeStart :
-      undefined,
-    endTimestamp: current.trackUri ?
+      undefined : undefined,
+    endTimestamp: current.trackUri ? current.timeEnd ?
       Math.round(Date.now() / 1000) + (current.timeEnd - current.timeStart) :
-      undefined,
+      undefined : undefined,
     partyId: current.trackUri ? `party_${current.trackUri}` : undefined,
     spectateSecret: current.trackUri ? current.trackUri : undefined,
     instance: true,
@@ -80,7 +80,7 @@ function stateChanged({ track, playing, playing_position }) {
     return true;
   if (playing !== current.playing)
     return true;
-  if (Math.round(playing_position) === current.timeStart)
+  if (current.playing && Math.round(playing_position) === current.timeStart)
     return true;
   return false;
 }
